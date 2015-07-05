@@ -2,7 +2,7 @@
 Java
 
 # Environment Setup
-[java-algo4](http://algs4.cs.princeton.edu/mac/)
+[java-algs4](http://algs4.cs.princeton.edu/mac/)
 
 ## CLI
 Normal
@@ -25,6 +25,9 @@ javac -cp "$jars" -g -encoding UTF-8 "$@"
 ```
 
 ## IntelliJ
-1. Open the root director as the project root.
+1. Open the root director as the project root
 1. Set language level to 6
 1. Add `algs4.jar` and `stdlib.jar` to project's external libraries
+1. In any assignment folder, mark `src` as `Sources Root`
+1. Create target folder `tagert/classes`, `target/test-classes`, and add them to project target folders. 
+1. To compile,
