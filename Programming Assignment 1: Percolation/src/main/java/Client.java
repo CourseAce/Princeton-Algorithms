@@ -1,19 +1,21 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Created by Daniel on 06/07/15.
  */
 public class Client {
-    String path;
-    public Client(String path) throws IOException {
+    File f;
+    public Client(String path) throws IOException, URISyntaxException {
         ClassLoader classLoader = getClass().getClassLoader();
-        this.path = classLoader.getResource(path).getPath();
+        this.f = new File(classLoader.getResource(path).toURI());
     }
 
     public Percolation run() throws IOException {
-        FileReader fileReader = new FileReader(this.path);
+        FileReader fileReader = new FileReader(this.f);
         BufferedReader buffReader = new BufferedReader(fileReader);
         String l = buffReader.readLine();
         Percolation percolation = new Percolation(Integer.parseInt(l));
@@ -24,9 +26,9 @@ public class Client {
         return percolation;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         Client c = new Client("percolation/input4.txt");
         Percolation percolation = c.run();
-        percolation.isFull(4, 4);
+        System.out.println(percolation.isFull(4, 4));
     }
 }
