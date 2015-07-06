@@ -68,7 +68,9 @@ public class Percolation {
      */
     public boolean isOpen(int i, int j) {
         try {
-            return this.mat[i - 1][j - 1];
+            i -= 1;
+            j -= 1;
+            return this.mat[i][j];
         } catch (IndexOutOfBoundsException e) {
             throw new IndexOutOfBoundsException();
         }
@@ -82,7 +84,14 @@ public class Percolation {
      * @return
      */
     public boolean isFull(int i, int j) {
-        return this.uf.connected(this.flat(i, j), this.HEAD);
+        try {
+            i -= 1;
+            j -= 1;
+            return this.uf.connected(this.flat(i, j), this.HEAD);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException();
+        }
+
     }
 
     /**
