@@ -4,7 +4,8 @@
 
 
 public class Percolation {
-    private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF ufDualEnd;
+    private WeightedQuickUnionUF ufSingleEnd;
     private boolean[][] mat;
     private int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
     private int N;
@@ -21,14 +22,20 @@ public class Percolation {
             throw new IllegalArgumentException();
 
         this.N = N;
-        this.uf = new WeightedQuickUnionUF(N * N + 2);  // the last two is for dummies
+        this.ufDualEnd = new WeightedQuickUnionUF(N*N+2);  // the last two is for dummies
+        this.ufSingleEnd = new WeightedQuickUnionUF(N*N+1);
         this.mat = new boolean[N][N];
-        this.HEAD = N * N;
-        this.TAIL = N * N + 1;
+        this.HEAD = N*N;
+        this.TAIL = N*N+1;
+    }
+
+    private void unionUF(int a, int b) {
+        this.ufDualEnd.union(a, b);
+        this.ufSingleEnd.union(a, b);
     }
 
     private int flat(int i, int j) {
-        return i * this.N + j;
+        return i*this.N+j;
     }
 
     /**
@@ -39,20 +46,21 @@ public class Percolation {
      */
     public void open(int i, int j) {
         try {
-            i = i - 1;
-            j = j - 1;
+            i -= 1;
+            j -= 1;
             this.mat[i][j] = true;
             for (int[] dir : this.dirs) {
                 int i1 = i + dir[0];
                 int j1 = j + dir[1];
                 if (i1 >= 0 && i1 < this.N && j1 >= 0 && j1 < this.N && this.mat[i1][j1]) {
-                    this.uf.union(this.flat(i, j), this.flat(i1, j1));
+                    this.unionUF(this.flat(i, j), this.flat(i1, j1));
                 }
             }
             if (i == 0) {
-                this.uf.union(this.flat(i, j), this.HEAD);
-            } else if (i == N - 1) {
-                this.uf.union(this.flat(i, j), this.TAIL);
+                this.unionUF(this.flat(i, j), this.HEAD);
+            }
+            if (i == this.N - 1) {
+                this.ufDualEnd.union(this.flat(i, j), this.TAIL);
             }
         } catch (IndexOutOfBoundsException e) {
             throw new IndexOutOfBoundsException();
@@ -87,7 +95,7 @@ public class Percolation {
         try {
             i -= 1;
             j -= 1;
-            return this.uf.connected(this.flat(i, j), this.HEAD);
+            return this.mat[i][j] && this.ufSingleEnd.connected(this.flat(i, j), this.HEAD);
         } catch (IndexOutOfBoundsException e) {
             throw new IndexOutOfBoundsException();
         }
@@ -100,7 +108,7 @@ public class Percolation {
      * @return
      */
     public boolean percolates() {
-        return this.uf.connected(this.HEAD, this.TAIL);
+        return this.ufDualEnd.connected(this.HEAD, this.TAIL);
     }
 
     /**
@@ -109,6 +117,13 @@ public class Percolation {
      * @param args
      */
     public static void main(String[] args) {
-
+        Percolation percolation = new Percolation(4);
+        for (int i=1; i<=4; i++) {
+            percolation.open(i, 1);
+        }
+        percolation.open(1, 4);
+        percolation.open(2, 4);
+        percolation.open(4, 4);
+        System.out.println(percolation.isFull(4, 4));
     }
 }
