@@ -1,12 +1,11 @@
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 /**
  * Created by Daniel on 10/07/15.
  */
 public class RandomizedQueue<Item> implements Iterable<Item> {
+    private final int MIN_SZ = 2;
     private int sz;
     private Item[] mem;  // can be replaced by ArrayList
 
@@ -15,7 +14,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
      */
     public RandomizedQueue() {
         this.sz = 0;
-        this.mem = (Item[]) new Object[2];  // casting referenceeeee
+        this.mem = (Item[]) new Object[MIN_SZ];  // casting referenceeeee
     }
 
     /**
@@ -48,6 +47,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private void resize(int l) {
+        l = Math.max(l, MIN_SZ);
         Item[] org = this.mem;
         this.mem = (Item []) new Object[l];
         for (int i=0; i < Math.min(l, org.length); i++)
@@ -95,6 +95,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return new RandomizedQueueIterator();
     }
 
+    /**
+     * In the case of INTERMIXED call with add, remove, the behavior of an iterator is unspecified if the underlying
+     * collection is modified while the iteration is in progress in any way other than by calling this method.
+     */
     private class RandomizedQueueIterator implements Iterator<Item> {
         int[] idx;
         int cur;
@@ -126,24 +130,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
      * @param args
      */
     public static void main(String[] args) {
-        RandomizedQueue<Integer> q = new RandomizedQueue<Integer>();
-        int[] expected = new int[] {1, 2, 3};
-        Set<Integer> exp = new HashSet<Integer>();
-        for (int i: expected) {
-            exp.add(i);
-            q.enqueue(i);
-        }
-        for (Integer elt: q) {
-            assert exp.contains(elt);
-            exp.remove(elt);
-        }
-
-        for (int i: expected) exp.add(i);
-        int sz = q.size();
-        for (int i=0; i < sz; i++) {
-            int elt = q.dequeue();
-            assert exp.contains(elt);
-            exp.remove(elt);
-        }
+        RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
+        rq.enqueue(239);
+        rq.dequeue();
+        rq.enqueue(792);
+        rq.dequeue();
+        rq.size();
+        rq.enqueue(70);
     }
 }

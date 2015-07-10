@@ -76,7 +76,7 @@ public class Deque<Item> implements Iterable<Item> {
         else {
             this.last_ptr.next.next = cur;
             cur.pre = this.last_ptr.next;
-            this.last_ptr = this.last_ptr.next;
+            this.last_ptr.next = cur;
         }
         this.sz += 1;
     }
@@ -155,19 +155,13 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<Integer>();
-        deque.addFirst(1);
-        deque.addFirst(2);
-        deque.removeLast();
-        deque.removeLast();
-        assert deque.size() == 0;
-
         deque.addFirst(0);
         deque.addFirst(1);
-        deque.removeFirst();
-        deque.size();
-        deque.addFirst(4);
-        deque.isEmpty();
-        deque.removeLast();
-        deque.addLast(7);
+        deque.addLast(2);
+        deque.addFirst(3);
+        assert deque.removeLast() == 2;
+        deque.addLast(5);
+        deque.addFirst(6);
+        assert deque.removeLast() == 5;
     }
 }
