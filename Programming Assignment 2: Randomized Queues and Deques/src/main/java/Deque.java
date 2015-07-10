@@ -8,6 +8,7 @@ public class Deque<Item> implements Iterable<Item> {
     private class Node {
         Item item;
         Node next;
+        Node pre;
         public Node(Item item) {
             this.item = item;
         }
@@ -54,6 +55,7 @@ public class Deque<Item> implements Iterable<Item> {
             this.last_ptr.next = cur;
         }
         else {
+            this.front_ptr.next.pre = cur;
             cur.next = this.front_ptr.next;
             this.front_ptr.next = cur;
         }
@@ -73,7 +75,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
         else {
             this.last_ptr.next.next = cur;
-            this.last_ptr.next = cur;
+            cur.pre = this.last_ptr.next;
+            this.last_ptr = this.last_ptr.next;
         }
         this.sz += 1;
     }
@@ -91,6 +94,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
         else {
             this.front_ptr.next = cur.next;
+            cur.next.pre = this.front_ptr;
         }
         this.sz -= 1;
         return cur.item;
@@ -108,7 +112,8 @@ public class Deque<Item> implements Iterable<Item> {
             this.last_ptr.next = null;
         }
         else {
-            this.last_ptr.next = cur.next;
+            cur.pre.next = null;
+            this.last_ptr.next = cur.pre;
         }
         this.sz -= 1;
         return cur.item;
@@ -155,5 +160,14 @@ public class Deque<Item> implements Iterable<Item> {
         deque.removeLast();
         deque.removeLast();
         assert deque.size() == 0;
+
+        deque.addFirst(0);
+        deque.addFirst(1);
+        deque.removeFirst();
+        deque.size();
+        deque.addFirst(4);
+        deque.isEmpty();
+        deque.removeLast();
+        deque.addLast(7);
     }
 }

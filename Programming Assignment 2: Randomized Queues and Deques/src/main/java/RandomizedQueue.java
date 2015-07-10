@@ -1,12 +1,14 @@
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Created by Daniel on 10/07/15.
  */
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private int sz;
-    private Item[] mem;
+    private Item[] mem;  // can be replaced by ArrayList
 
     /**
      * construct an empty randomized queue
@@ -125,16 +127,23 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
      */
     public static void main(String[] args) {
         RandomizedQueue<Integer> q = new RandomizedQueue<Integer>();
-        q.enqueue(1);
-        q.enqueue(2);
-        q.enqueue(3);
-        for (Integer elt: q) {
-            System.out.println(elt);
+        int[] expected = new int[] {1, 2, 3};
+        Set<Integer> exp = new HashSet<Integer>();
+        for (int i: expected) {
+            exp.add(i);
+            q.enqueue(i);
         }
+        for (Integer elt: q) {
+            assert exp.contains(elt);
+            exp.remove(elt);
+        }
+
+        for (int i: expected) exp.add(i);
         int sz = q.size();
         for (int i=0; i < sz; i++) {
             int elt = q.dequeue();
-            System.out.println(elt);
+            assert exp.contains(elt);
+            exp.remove(elt);
         }
     }
 }
