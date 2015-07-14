@@ -45,7 +45,7 @@ public class Brute {
     }
 
     private void drawPoints() {
-        for(Point point: this.points)
+        for (Point point: this.points)
             point.draw();
     }
 
