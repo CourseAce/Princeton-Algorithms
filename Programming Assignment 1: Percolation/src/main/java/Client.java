@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 public class Client {
     File f;
     public Client(String path) throws IOException, URISyntaxException {
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = this.getClass().getClassLoader();
         this.f = new File(classLoader.getResource(path).toURI());
     }
 

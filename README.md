@@ -2,7 +2,8 @@
 Java
 
 # Environment Setup
-Read instructions on installation of java and its dependencies: [java-algs4](http://algs4.cs.princeton.edu/mac/)
+* Read instructions on installation of java and its dependencies: [java-algs4](http://algs4.cs.princeton.edu/mac/)
+* Set Java compiler langauge level to 6.
 
 ## CLI
 To run programm in the command line interface (CLI):
