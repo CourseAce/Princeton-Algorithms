@@ -1,26 +1,32 @@
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by Daniel on 16/07/15.
  */
 public class Solver {
-    private BoardPi finalState;
+    private SearchNode finalNode;
 
-    private class BoardPi implements Comparable<BoardPi> {
+    private class SearchNode implements Comparable<SearchNode> {
         private Board board;
-        private BoardPi pi;
-        private int curCost;
+        private SearchNode pi;
+        private int cost;
 
-        private BoardPi(Board board, BoardPi pi, int curCost) {
+        private SearchNode(Board board, SearchNode pi, int cost) {
             if (board == null)
                 throw new NullPointerException();
 
             this.board = board;
             this.pi = pi;
-            this.curCost = curCost;
+            this.cost = cost;
         }
 
         @Override
-        public int compareTo(BoardPi o) {
-            return (this.curCost+this.board.hamming()) - (o.curCost+o.board.hamming());
+        public int compareTo(SearchNode o) {
+            return (this.cost+this.board.hamming()) - (o.cost+o.board.hamming());
         }
     }
 
@@ -33,25 +39,37 @@ public class Solver {
             throw new NullPointerException();
 
         // solve the puzzle
-        MinPQ<BoardPi> pq = new MinPQ<>();
-        MinPQ<BoardPi> pqTwin = new MinPQ<>();
-        pq.insert(new BoardPi(initial, null, 0));
-        pqTwin.insert(new BoardPi(initial.twin(), null, 0));
-        while (!pq.isEmpty() && !pqTwin.isEmpty()) {
-            BoardPi cur = pq.delMin();
-            BoardPi curTwin = pqTwin.delMin();
-            if (cur.board.isGoal()) {
-                finalState = cur;
-                return;
-            }
-            if (curTwin.board.isGoal()) {
-                return;
-            }
-            for (Board nei: cur.board.neighbors()) {
-                pq.insert(new BoardPi(nei, cur, cur.curCost+1));
-            }
-            for (Board nei: curTwin.board.neighbors()) {
-                pqTwin.insert(new BoardPi(nei, curTwin, curTwin.curCost+1));
+        List<MinPQ<SearchNode>> pqs = new ArrayList<>();
+        pqs.add(new MinPQ<SearchNode>());
+        pqs.add(new MinPQ<SearchNode>());
+
+        List<Set<Board>> visits = new ArrayList<>();
+        visits.add(new HashSet<Board>());
+        visits.add(new HashSet<Board>());
+
+        Board[] initials = new Board[] {initial, initial.twin()};
+        for (int i=0; i < initials.length; i++) {
+            pqs.get(i).insert(new SearchNode(initials[i], null, 0));
+            visits.get(i).add(initials[i]);
+        }
+        while (true) {
+            for (MinPQ pq: pqs)
+                if (pq.isEmpty())
+                    break;
+
+            for (int i=0; i < initials.length; i++) {
+                SearchNode cur = pqs.get(i).delMin();
+                if (cur.board.isGoal()) {
+                    if (i == 0)
+                        finalNode = cur;
+                    return;
+                }
+                for (Board nei: cur.board.neighbors()) {
+                    if (!visits.get(i).contains(nei)) {
+                        visits.get(i).add(nei);
+                        pqs.get(i).insert(new SearchNode(nei, cur, cur.cost+1));
+                    }
+                }
             }
         }
     }
@@ -61,7 +79,7 @@ public class Solver {
      * @return
      */
     public boolean isSolvable() {
-        return this.finalState != null;
+        return this.finalNode != null;
     }
 
     /**
@@ -69,10 +87,10 @@ public class Solver {
      * @return
      */
     public int moves() {
-        if (this.finalState == null)
+        if (this.finalNode == null)
             return -1;
 
-        return this.finalState.curCost;
+        return this.finalNode.cost;
     }
 
     /**
@@ -80,11 +98,11 @@ public class Solver {
      * @return
      */
     public Iterable<Board> solution() {
-        if (this.finalState == null)
+        if (this.finalNode == null)
             return null;
 
         Stack<Board> ret = new Stack<>();
-        for (BoardPi cur=finalState; cur != null; cur = cur.pi) {
+        for (SearchNode cur= finalNode; cur != null; cur = cur.pi) {
             ret.push(cur.board);
         }
 
@@ -95,27 +113,38 @@ public class Solver {
      * solve a slider puzzle (given below)
      * @param args
      */
-    public static void main(String[] args) {
-        // create initial board from file
-        In in = new In(args[0]);
-        int N = in.readInt();
-        int[][] blocks = new int[N][N];
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < N; j++)
-                blocks[i][j] = in.readInt();
+    public static void main(String[] args){
+        try {
+            // create initial board from file
+            File f;
+            if (args.length > 0)
+                f = new File(args[0]);
+            else
+                f = new File(Solver.class.getResource("8puzzle/puzzle00.txt").toURI());
 
-        Board initial = new Board(blocks);
+            In in = new In(f);
+            int N = in.readInt();
+            int[][] blocks = new int[N][N];
+            for (int i = 0; i < N; i++)
+                for (int j = 0; j < N; j++)
+                    blocks[i][j] = in.readInt();
 
-        // solve the puzzle
-        Solver solver = new Solver(initial);
+            Board initial = new Board(blocks);
 
-        // print solution to standard output
-        if (!solver.isSolvable())
-            StdOut.println("No solution possible");
-        else {
-            StdOut.println("Minimum number of moves = " + solver.moves());
-            for (Board board : solver.solution())
-                StdOut.println(board);
+            // solve the puzzle
+            Solver solver = new Solver(initial);
+
+            // print solution to standard output
+            if (!solver.isSolvable())
+                StdOut.println("No solution possible");
+            else {
+                StdOut.println("Minimum number of moves = " + solver.moves());
+                for (Board board : solver.solution())
+                    StdOut.println(board);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
