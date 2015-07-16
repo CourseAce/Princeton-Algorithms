@@ -8,7 +8,7 @@ public class Board {
     private final int[][] board;
     private final int N;
     private int[] p0;
-    private static final int[][] DIRS = new int[][] {{0, 1}, {0, -1}, {1, 0}, {1, 0}};
+    private static final int[][] DIRS = new int[][] {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
     /**
      * construct a board from an N-by-N array of blocks
      * (where blocks[i][j] = block in row i, column j)
@@ -99,7 +99,7 @@ public class Board {
         for (int i=0; i < this.N; i++)
             for (int j=1; j < this.N; j++)
                 if (this.board[i][j] != 0 && this.board[i][j-1] !=0) {
-                    int[][] twin = this.board.clone();
+                    int[][] twin = this.cloneBoard();
                     int t = twin[i][j]; twin[i][j] = twin[i][j-1]; twin[i][j-1] = t;
                     return new Board(twin);
                 }
@@ -142,7 +142,7 @@ public class Board {
             int i1 = i+dir[0];
             int j1 = j+dir[1];
             if (0 <= i1 && i1 < this.N && 0 <= j1 && j1 < this.N) {
-                int[][] board1 = this.board.clone();
+                int[][] board1 = this.cloneBoard();
                 int t = board1[i1][j1]; board1[i1][j1] = board1[i][j]; board1[i][j] = t;
                 ret.add(new Board(board1));
             }
@@ -159,12 +159,21 @@ public class Board {
         sb.append(this.dimension());
         sb.append("\n");
         for (int i=0; i < this.N; i++) {
-            for (int j=0; j < this.N; j++)
+            for (int j=0; j < this.N; j++) {
                 sb.append(this.board[i][j]);
-
+                if (j != this.N-1) sb.append(" ");
+            }
             if (i != this.N-1) sb.append("\n");
         }
         return sb.toString();
+    }
+
+    private int[][] cloneBoard() {
+        int[][] ret = this.board.clone();
+        for (int i=0; i < ret.length; i++) {
+            ret[i] = this.board[i].clone();
+        }
+        return ret;
     }
 
     /**

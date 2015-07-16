@@ -120,7 +120,7 @@ public class Solver {
             if (args.length > 0)
                 f = new File(args[0]);
             else
-                f = new File(Solver.class.getResource("8puzzle/puzzle00.txt").toURI());
+                f = new File(Solver.class.getResource("8puzzle/puzzle4x4-unsolvable.txt").toURI());
 
             In in = new In(f);
             int N = in.readInt();
