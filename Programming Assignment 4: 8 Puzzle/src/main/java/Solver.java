@@ -1,8 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Daniel on 16/07/15.
@@ -13,20 +10,22 @@ public class Solver {
     private class SearchNode implements Comparable<SearchNode> {
         private Board board;
         private SearchNode pi;
+        private boolean isTwin;
         private int cost;
 
-        private SearchNode(Board board, SearchNode pi, int cost) {
+        private SearchNode(Board board, SearchNode pi, boolean isTwin, int cost) {
             if (board == null)
                 throw new NullPointerException();
 
             this.board = board;
             this.pi = pi;
+            this.isTwin = isTwin;
             this.cost = cost;
         }
 
         @Override
         public int compareTo(SearchNode o) {
-            return (this.cost+this.board.hamming()) - (o.cost+o.board.hamming());
+            return (this.cost+this.board.manhattan()) - (o.cost+o.board.manhattan());
         }
     }
 
@@ -39,36 +38,24 @@ public class Solver {
             throw new NullPointerException();
 
         // solve the puzzle
-        List<MinPQ<SearchNode>> pqs = new ArrayList<>();
-        pqs.add(new MinPQ<SearchNode>());
-        pqs.add(new MinPQ<SearchNode>());
+        // rather than create two queues, put the twin in the same queue to save memory from time.
+        MinPQ<SearchNode> pq = new MinPQ<>();
+        Set<Board> visited = new HashSet<>();
+        pq.insert(new SearchNode(initial, null, false, 0));
+        visited.add(initial);
+        pq.insert(new SearchNode(initial.twin(), null, true, 0));
+        visited.add(initial.twin());
 
-        List<Set<Board>> visits = new ArrayList<>();
-        visits.add(new HashSet<Board>());
-        visits.add(new HashSet<Board>());
-
-        Board[] initials = new Board[] {initial, initial.twin()};
-        for (int i=0; i < initials.length; i++) {
-            pqs.get(i).insert(new SearchNode(initials[i], null, 0));
-            visits.get(i).add(initials[i]);
-        }
-        while (true) {
-            for (MinPQ pq: pqs)
-                if (pq.isEmpty())
-                    break;
-
-            for (int i=0; i < initials.length; i++) {
-                SearchNode cur = pqs.get(i).delMin();
-                if (cur.board.isGoal()) {
-                    if (i == 0)
-                        finalNode = cur;
-                    return;
-                }
-                for (Board nei: cur.board.neighbors()) {
-                    if (!visits.get(i).contains(nei)) {
-                        visits.get(i).add(nei);
-                        pqs.get(i).insert(new SearchNode(nei, cur, cur.cost+1));
-                    }
+        while (!pq.isEmpty()) {
+            SearchNode cur = pq.delMin();
+            if (cur.board.isGoal()) {
+                finalNode = cur;
+                return;
+            }
+            for (Board nei: cur.board.neighbors()) {
+                if (!visited.contains(nei)) {
+                    visited.add(nei);
+                    pq.insert(new SearchNode(nei, cur, cur.isTwin, cur.cost+1));
                 }
             }
         }
@@ -79,7 +66,7 @@ public class Solver {
      * @return
      */
     public boolean isSolvable() {
-        return this.finalNode != null;
+        return this.finalNode != null && !this.finalNode.isTwin;
     }
 
     /**
@@ -87,7 +74,7 @@ public class Solver {
      * @return
      */
     public int moves() {
-        if (this.finalNode == null)
+        if (!this.isSolvable())
             return -1;
 
         return this.finalNode.cost;
@@ -119,8 +106,12 @@ public class Solver {
             File f;
             if (args.length > 0)
                 f = new File(args[0]);
-            else
-                f = new File(Solver.class.getResource("8puzzle/puzzle4x4-unsolvable.txt").toURI());
+            else {
+                String path = "8puzzle/puzzle30.txt";
+                // path = "8puzzle/puzzle4x4-unsolvable.txt";
+                f = new File(Solver.class.getResource(path).toURI());
+            }
+
 
             In in = new In(f);
             int N = in.readInt();

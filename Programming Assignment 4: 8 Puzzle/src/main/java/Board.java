@@ -42,13 +42,14 @@ public class Board {
 
     /**
      * number of blocks out of place
+     * Don't count 0 otherwise not admissible
      * @return
      */
     public int hamming() {
         int cnt = 0;
         for (int i=0; i < this.N; i++)
             for (int j=0; j < this.N; j++)
-                if (this.board[i][j] != (i*this.N+j+1)%(this.N*this.N))
+                if (this.board[i][j] != 0 && this.board[i][j] != (i*this.N+j+1)%(this.N*this.N))
                     cnt += 1;
 
         return cnt;
@@ -63,15 +64,18 @@ public class Board {
 
     /**
      * sum of Manhattan distances between blocks and goal
+     * Don't count 0 otherwise not admissible
      * @return
      */
     public int manhattan() {
         int cnt = 0;
         for (int i=0; i < this.N; i++)
             for (int j=0; j < this.N; j++) {
-                int[] goalPos = this.num2pos(this.board[i][j]);
-                cnt += Math.abs(goalPos[0]-i);
-                cnt += Math.abs(goalPos[1]-j);
+                if (this.board[i][j] != 0) {
+                    int[] goalPos = this.num2pos(this.board[i][j]);
+                    cnt += Math.abs(goalPos[0]-i);
+                    cnt += Math.abs(goalPos[1]-j);
+                }
             }
 
         return cnt;
