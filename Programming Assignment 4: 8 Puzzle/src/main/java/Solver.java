@@ -1,5 +1,6 @@
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Daniel on 16/07/15.
@@ -10,16 +11,14 @@ public class Solver {
     private class SearchNode implements Comparable<SearchNode> {
         private Board board;
         private SearchNode pi;
-        private boolean isTwin;
         private int cost;
 
-        private SearchNode(Board board, SearchNode pi, boolean isTwin, int cost) {
+        private SearchNode(Board board, SearchNode pi, int cost) {
             if (board == null)
                 throw new NullPointerException();
 
             this.board = board;
             this.pi = pi;
-            this.isTwin = isTwin;
             this.cost = cost;
         }
 
@@ -38,24 +37,30 @@ public class Solver {
             throw new NullPointerException();
 
         // solve the puzzle
-        // rather than create two queues, put the twin in the same queue to save memory from time.
-        MinPQ<SearchNode> pq = new MinPQ<>();
-        Set<Board> visited = new HashSet<>();
-        pq.insert(new SearchNode(initial, null, false, 0));
-        visited.add(initial);
-        pq.insert(new SearchNode(initial.twin(), null, true, 0));
-        visited.add(initial.twin());
+        List<MinPQ<SearchNode>> pqs = new ArrayList<>();
+        // List<Set<Board>> visits = new ArrayList<>();  // java array hash code using Object's; thus works poorly;
 
-        while (!pq.isEmpty()) {
-            SearchNode cur = pq.delMin();
-            if (cur.board.isGoal()) {
-                finalNode = cur;
-                return;
-            }
-            for (Board nei: cur.board.neighbors()) {
-                if (!visited.contains(nei)) {
-                    visited.add(nei);
-                    pq.insert(new SearchNode(nei, cur, cur.isTwin, cur.cost+1));
+        Board[] initials = new Board[] {initial, initial.twin()};
+        for (int i=0; i < initials.length; i++) {
+            pqs.add(new MinPQ<SearchNode>());
+            pqs.get(i).insert(new SearchNode(initials[i], null, 0));
+        }
+        while (true) {
+            for (MinPQ pq: pqs)
+                if (pq.isEmpty())
+                    break;
+
+            for (int i=0; i < initials.length; i++) {
+                SearchNode cur = pqs.get(i).delMin();
+                if (cur.board.isGoal()) {
+                    if (i == 0)
+                        finalNode = cur;
+                    return;
+                }
+                for (Board nei: cur.board.neighbors()) {
+                    if (!(cur.pi != null && nei.equals(cur.pi.board))) {
+                        pqs.get(i).insert(new SearchNode(nei, cur, cur.cost+1));
+                    }
                 }
             }
         }
@@ -66,7 +71,7 @@ public class Solver {
      * @return
      */
     public boolean isSolvable() {
-        return this.finalNode != null && !this.finalNode.isTwin;
+        return this.finalNode != null;
     }
 
     /**
@@ -74,7 +79,7 @@ public class Solver {
      * @return
      */
     public int moves() {
-        if (!this.isSolvable())
+        if (this.finalNode == null)
             return -1;
 
         return this.finalNode.cost;
@@ -100,7 +105,8 @@ public class Solver {
      * solve a slider puzzle (given below)
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args){
+        Stopwatch w = new Stopwatch();
         try {
             // create initial board from file
             File f;
@@ -137,5 +143,6 @@ public class Solver {
         catch (Exception e) {
             e.printStackTrace();
         }
+        // System.out.println(w.elapsedTime());
     }
 }

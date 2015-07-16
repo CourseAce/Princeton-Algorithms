@@ -9,6 +9,9 @@ public class Board {
     private final int[] board;
     private final int N;
     private int p0;
+    private int hamm = -1;
+    private int maha = -1;
+
     private static final int[][] DIRS = new int[][] {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
     /**
      * construct a board from an N-by-N array of blocks
@@ -48,12 +51,15 @@ public class Board {
      * @return
      */
     public int hamming() {
-        int cnt = 0;
-        for (int i=0; i < this.N*this.N; i++)
-            if (this.board[i] != 0 && this.board[i]-1 != i)
-                cnt += 1;
+        if (this.hamm == -1) {
+            int cnt = 0;
+            for (int i=0; i < this.N*this.N; i++)
+                if (this.board[i] != 0 && this.board[i]-1 != i)
+                    cnt += 1;
 
-        return cnt;
+            this.hamm = cnt;
+        }
+        return this.hamm;
     }
 
     private int project1d(int i, int j) {
@@ -72,16 +78,19 @@ public class Board {
      * @return
      */
     public int manhattan() {
-        int cnt = 0;
-        for (int i=0; i < this.N*this.N; i++)
-            if (this.board[i] != 0) {
-                int[] cur = this.reconstruct2d(i);
-                int[] goal = this.reconstruct2d(this.board[i]-1);
-                cnt += Math.abs(cur[0]-goal[0]);
-                cnt += Math.abs(cur[1]-goal[1]);
-            }
+        if (this.maha == -1) {
+            int cnt = 0;
+            for (int i=0; i < this.N*this.N; i++)
+                if (this.board[i] != 0) {
+                    int[] cur = this.reconstruct2d(i);
+                    int[] goal = this.reconstruct2d(this.board[i]-1);
+                    cnt += Math.abs(cur[0]-goal[0]);
+                    cnt += Math.abs(cur[1]-goal[1]);
+                }
+            this.maha = cnt;
+        }
 
-        return cnt;
+        return this.maha;
     }
 
     /**
