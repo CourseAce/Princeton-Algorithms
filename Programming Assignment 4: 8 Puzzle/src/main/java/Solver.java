@@ -100,7 +100,7 @@ public class Solver {
      * solve a slider puzzle (given below)
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
             // create initial board from file
             File f;
