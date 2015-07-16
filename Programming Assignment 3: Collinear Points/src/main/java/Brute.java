@@ -15,7 +15,7 @@ public class Brute {
             Brute c = new Brute();
 
             if (args.length < 1) {
-                path = "collinear/input400.txt";  // debug
+                path = "collinear/input300.txt";  // debug
                 f = new File(c.getClass().getClassLoader().getResource(path).toURI());
             }
             else {

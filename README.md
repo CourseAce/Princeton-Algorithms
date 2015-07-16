@@ -30,7 +30,7 @@ javac -cp "$jars" -g -encoding UTF-8 "$@"
 To run programm in IntelliJ:
 
 1. Open the root director as the project root in IntelliJ
-1. Set language level to 6
+1. Set language level to 7
 1. Add `~/algs4/algs4.jar` and `~/algs4/stdlib.jar` to project's external libraries
 1. In each assignment folder, mark `src` as `Sources Root`
 1. Create target folder `tagert/classes`, `target/test-classes`, and add them to project target folders

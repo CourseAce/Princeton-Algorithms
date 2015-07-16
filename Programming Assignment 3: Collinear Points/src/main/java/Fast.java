@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Should extends Brute but the OJ won't allow the protected/public/package methods except for the main.
@@ -19,7 +16,7 @@ public class Fast {
             Fast c = new Fast();
 
             if (args.length < 1) {
-                path = "collinear/input400.txt";  // debug
+                path = "collinear/mystery10089.txt";  // debug
                 f = new File(c.getClass().getClassLoader().getResource(path).toURI());
             }
             else {
@@ -42,7 +39,10 @@ public class Fast {
         int n = Integer.parseInt(br.readLine());
         Point[] points = new Point[n];
         for (int i=0; i < n; i++) {
-            String[] s = br.readLine().trim().split("\\s+");
+            String[] s;
+            do {
+                s = br.readLine().trim().split("\\s+");
+            } while (s.length != 2);
             points[i] = new Point(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
         }
         this.points = points;
@@ -85,7 +85,7 @@ public class Fast {
     }
 
     /**
-     * Algorithm, only this mehtod is different from Brute.java
+     * Algorithm, only this method is different from Brute.java
      *
      * To prevent printing the same line multiple times:
      *  use the "compareTo" method to compare the y value of the original point you used to compute slope and y value of
@@ -98,17 +98,19 @@ public class Fast {
         Collections.sort(points);
         for (int i=0; i < points.size(); i++) {
             Point p0 = points.get(i);
-            List<Point> others = points.subList(i+1, points.size());
-            Collections.sort(others, p0.SLOPE_ORDER);
-            for (int s=0; s < others.size(); s++) {
-                int e;
-                for (e=s; e < others.size() && p0.SLOPE_ORDER.compare(others.get(s), others.get(e)) == 0; e++);
-                if (e-s+1 >= 4) {
-                    List<Point> r = new ArrayList<>(others.subList(s, e));
+            List<Point> cp = new ArrayList<>(points); // clone
+            Collections.sort(cp, p0.SLOPE_ORDER);
+            for (int s=0, e; s < cp.size(); s=e) {
+                for (e=s; e < cp.size() && p0.SLOPE_ORDER.compare(cp.get(s) , cp.get(e)) == 0; e++);
+                if (e-s+1>= 4) {
+                    List<Point> r = new ArrayList<>(cp.subList(s, e));
                     r.add(p0);
-                    Point[] ret = r.toArray(new Point[e-s+1]);
-                    StdOut.println(this.toString(ret));
-                    this.drawLine(ret);
+                    Collections.sort(r);
+                    if (r.get(0).equals(p0)) {
+                        Point[] ret = r.toArray(new Point[e-s+1]);
+                        StdOut.println(this.toString(ret));
+                        this.drawLine(ret);
+                    }
                 }
             }
         }

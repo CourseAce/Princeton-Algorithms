@@ -17,7 +17,11 @@ public class Point implements Comparable<Point> {
         public int compare(Point o1, Point o2) {
             double slope1 = Point.this.slopeTo(o1);
             double slope2 = Point.this.slopeTo(o2);
-            return Point.this.normalizeCompareTo(slope1-slope2);
+            // return Double.compare(slope1+0.0, slope2+0.0);  // avoid -0.0
+            if (slope1 < slope2) return -1;
+            if (slope1 == slope2) return 0;
+            return 1;
+
         }
     };
 
@@ -68,10 +72,11 @@ public class Point implements Comparable<Point> {
         int deltaY = this.y - that.y;
         int deltaX = this.x - that.x;
         if (deltaX == 0)
-            if (deltaY == 0) return Integer.MIN_VALUE;
-            else return Integer.MAX_VALUE;
+            if (deltaY == 0) return Double.NEGATIVE_INFINITY;  // rather than using Integer.MIN_VALUE;
+            else return Double.POSITIVE_INFINITY;
 
-        return deltaY/(double) (deltaX);
+        double ret = deltaY/(double) (deltaX);
+        return ret + 0.0;
     }
 
     /**
@@ -86,10 +91,8 @@ public class Point implements Comparable<Point> {
             return -1;
         else if (deltaY > 0)
             return 1;
-        else {
-            int deltaX = this.x - that.x;
-            return this.normalizeCompareTo(deltaX);
-        }
+        else
+            return Integer.compare(this.x, that.x);
     }
 
     /**
@@ -105,6 +108,12 @@ public class Point implements Comparable<Point> {
      * @param args
      */
     public static void main(String[] args) {
-        /* YOUR CODE HERE */
+        Point p = new Point(0, 9);
+        Point q = new Point(0, 3);
+        Point r = new Point(0, 3);
+        System.out.println(p.SLOPE_ORDER.compare(q, r));
+        System.out.println(Double.compare(0.0, -0.0));
+        System.out.println(0.0 == -0.0);
+        System.out.println(Double.POSITIVE_INFINITY+0.0);
     }
 }
