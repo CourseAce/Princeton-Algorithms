@@ -113,7 +113,7 @@ public class Solver {
             if (args.length > 0)
                 f = new File(args[0]);
             else {
-                String path = "8puzzle/puzzle30.txt";
+                String path = "8puzzle/puzzle36.txt";
                 // path = "8puzzle/puzzle4x4-unsolvable.txt";
                 f = new File(Solver.class.getResource(path).toURI());
             }
