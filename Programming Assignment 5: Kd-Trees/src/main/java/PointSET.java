@@ -81,7 +81,7 @@ public class PointSET {
         Point2D ret = null;
         for (Point2D c: this.set)
             if (ret == null || c.distanceSquaredTo(p) < ret.distanceSquaredTo(p))
-                ret = p;
+                ret = c;
 
         return ret;
     }

@@ -1,3 +1,6 @@
+import java.io.File;
+import java.net.URISyntaxException;
+
 /*************************************************************************
  *  Compilation:  javac NearestNeighborVisualizer.java
  *  Execution:    java NearestNeighborVisualizer input.txt
@@ -13,9 +16,12 @@
 
 public class NearestNeighborVisualizer {
 
-    public static void main(String[] args) {
-        String filename = args[0];
-        In in = new In(filename);
+    public static void main(String[] args) throws URISyntaxException {
+        In in;
+        if (args.length > 0)
+            in = new In(args[0]);
+        else
+            in = new In(new File(NearestNeighborVisualizer.class.getClassLoader().getResource("kdtree/circle100.txt").toURI()));
 
         StdDraw.show(0);
 

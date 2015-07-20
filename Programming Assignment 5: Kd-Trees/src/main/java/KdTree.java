@@ -18,6 +18,7 @@ public class KdTree {
             this.p = p;
             this.vertical = vertical;
             this.rect = rect;
+            this.sz = 1;
         }
     }
     /**
@@ -40,10 +41,7 @@ public class KdTree {
      * @return
      */
     public int size() {
-        if (this.isEmpty())
-            return 0;
-
-        return this.root.sz;
+        return this.size(this.root);
     }
 
     /**
@@ -82,12 +80,12 @@ public class KdTree {
                         cur.rect.xmin(), cur.p.y(), cur.rect.xmax(), cur.rect.ymax());
 
         }
-        cur.sz = 1+this.sz(cur.left)+this.sz(cur.right);
 
+        cur.sz = 1+this.size(cur.left)+this.size(cur.right);
         return cur;
     }
 
-    private int sz(Node cur) {
+    private int size(Node cur) {
         if (cur == null)
             return 0;
         else
@@ -197,7 +195,7 @@ public class KdTree {
         if (cur == null)
             return;
 
-        if (cur.p.distanceSquaredTo(p) < ret[0].distanceSquaredTo(p))
+        if (ret[0] == null || cur.p.distanceSquaredTo(p) < ret[0].distanceSquaredTo(p))
             ret[0] = cur.p;
 
         Node[] children = new Node[]{cur.left, cur.right};
@@ -209,7 +207,6 @@ public class KdTree {
         for (Node c: children)
             if (c != null && c.rect.distanceSquaredTo(p) < ret[0].distanceSquaredTo(p))
                 this.nearest(c, p, ret);
-
     }
 
     /**
