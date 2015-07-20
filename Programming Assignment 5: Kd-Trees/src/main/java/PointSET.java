@@ -1,12 +1,18 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Created by Daniel on 20/07/15.
  */
 public class PointSET {
+    private Set<Point2D> set;
     /**
      * construct an empty set of points
      */
     public PointSET() {
-
+        this.set = new TreeSet<>();
     }
 
     /**
@@ -14,7 +20,7 @@ public class PointSET {
      * @return
      */
     public boolean isEmpty() {
-        return false;
+        return this.set.isEmpty();
     }
 
     /**
@@ -22,7 +28,7 @@ public class PointSET {
      * @return
      */
     public int size() {
-        return 0;
+        return this.set.size();
     }
 
     /**
@@ -30,6 +36,7 @@ public class PointSET {
      * @param p
      */
     public void insert(Point2D p) {
+        this.set.add(p);
 
     }
 
@@ -39,14 +46,16 @@ public class PointSET {
      * @return
      */
     public boolean contains(Point2D p) {
-        return false;
+        return this.set.contains(p);
     }
 
     /**
      * draw all points to standard draw
      */
     public void draw() {
-
+        for (Point2D p: this.set) {
+            StdDraw.point(p.x(), p.y());
+        }
     }
 
     /**
@@ -55,7 +64,12 @@ public class PointSET {
      * @return
      */
     public Iterable<Point2D> range(RectHV rect) {
-        return null;
+        List<Point2D> ret = new ArrayList<>();
+        for (Point2D p: this.set)
+            if (rect.contains(p))
+                ret.add(p);
+
+        return ret;
     }
 
     /**
@@ -64,7 +78,12 @@ public class PointSET {
      * @return
      */
     public Point2D nearest(Point2D p) {
-        return null;
+        Point2D ret = null;
+        for (Point2D c: this.set)
+            if (ret == null || c.distanceSquaredTo(p) < ret.distanceSquaredTo(p))
+                ret = p;
+
+        return ret;
     }
 
     /**
